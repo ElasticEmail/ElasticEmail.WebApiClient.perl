@@ -100,7 +100,7 @@ package Api::Account;
             # bool sendActivation - True, if you want to send activation email to this account. Otherwise, false (default False)
             # string returnUrl - URL to navigate to after account creation (default None)
             # ApiTypes::SendingPermission? sendingPermission - Sending permission setting for account (default None)
-            # bool? enableContactFeatures - True, if you want to use Advanced Tools.  Otherwise, false (default None)
+            # bool? enableContactFeatures - True, if you want to use Contact Delivery Tools.  Otherwise, false (default None)
             # string poolName - Private IP required. Name of the custom IP Pool which Sub Account should use to send its emails. Leave empty for the default one or if no Private IPs have been bought (default None)
             # int emailSizeLimit - Maximum size of email including attachments in MB's (default 10)
             # int? dailySendLimit - Amount of emails account can send daily (default None)
@@ -453,6 +453,15 @@ package Api::Account;
         return $Api::mainApi->Request('account/removesubaccountcredits', "GET", @params);
     }
 
+        # Request premium support for your account
+            # string apikey - ApiKey that gives you access to our SMTP and HTTP API's.
+    sub RequestPremiumSupport
+    {
+        shift;
+        my @params = [apikey => $Api::mainApi->{apikey}];
+        return $Api::mainApi->Request('account/requestpremiumsupport', "GET", @params);
+    }
+
         # Request a private IP for your Account
             # string apikey - ApiKey that gives you access to our SMTP and HTTP API's.
             # int count - Number of items.
@@ -493,7 +502,7 @@ package Api::Account;
             # bool? inboundContactsOnly - True, if you want inbound email to only process contacts from your account. Otherwise, false (default None)
             # bool? lowCreditNotification - True, if you want to receive low credit email notifications. Otherwise, false (default None)
             # bool? enableUITooltips - True, if account has tooltips active. Otherwise, false (default None)
-            # bool? enableContactFeatures - True, if you want to use Advanced Tools.  Otherwise, false (default None)
+            # bool? enableContactFeatures - True, if you want to use Contact Delivery Tools.  Otherwise, false (default None)
             # string notificationsEmails - Email addresses to send a copy of all notifications from our system. Separated by semicolon (default None)
             # string unsubscribeNotificationsEmails - Emails, separated by semicolon, to which the notification about contact unsubscribing should be sent to (default None)
             # string logoUrl - URL to your logo image. (default None)
@@ -632,7 +641,7 @@ package Api::Account;
             # string subAccountEmail - Email address of sub-account (default None)
             # string publicAccountID - Public key of sub-account to update. Use subAccountEmail or publicAccountID not both. (default None)
             # ApiTypes::SendingPermission? sendingPermission - Sending permission setting for account (default None)
-            # bool? enableContactFeatures - True, if you want to use Advanced Tools.  Otherwise, false (default None)
+            # bool? enableContactFeatures - True, if you want to use Contact Delivery Tools.  Otherwise, false (default None)
             # string poolName - Name of your custom IP Pool to be used in the sending process (default None)
     sub UpdateSubAccountSettings
     {
@@ -924,25 +933,10 @@ package Api::Contact;
         # Add a new contact and optionally to one of your lists.  Note that your API KEY is not required for this call.
             # string publicAccountID - Public key for limited access to your account such as contact/add so you can use it safely on public websites.
             # string email - Proper email address.
-            # string[] publicListID - ID code of list (default None)
+            # IEnumerable<string> publicListID - ID code of list (default None)
             # string[] listName - Name of your list. (default None)
-            # string title - Title (default None)
             # string firstName - First name. (default None)
             # string lastName - Last name. (default None)
-            # string phone - Phone number (default None)
-            # string mobileNumber - Mobile phone number (default None)
-            # string notes - Free form field of notes (default None)
-            # string gender - Your gender (default None)
-            # DateTime? birthDate - Date of birth in YYYY-MM-DD format (default None)
-            # string city - City. (default None)
-            # string state - State or province. (default None)
-            # string postalCode - Zip/postal code. (default None)
-            # string country - Name of country. (default None)
-            # string organizationName - Name of organization (default None)
-            # string website - HTTP address of your website. (default None)
-            # int? annualRevenue - Annual revenue of contact (default None)
-            # string industry - Industry contact works in (default None)
-            # int? numberOfEmployees - Number of employees (default None)
             # ApiTypes::ContactSource source - Specifies the way of uploading the contact (default ApiTypes.ContactSource.ContactApi)
             # string returnUrl - URL to navigate to after account creation (default None)
             # string sourceUrl - URL from which request was sent. (default None)
@@ -961,23 +955,8 @@ package Api::Contact;
                         email => shift,
                         publicListID => shift,
                         listName => shift,
-                        title => shift,
                         firstName => shift,
                         lastName => shift,
-                        phone => shift,
-                        mobileNumber => shift,
-                        notes => shift,
-                        gender => shift,
-                        birthDate => shift,
-                        city => shift,
-                        state => shift,
-                        postalCode => shift,
-                        country => shift,
-                        organizationName => shift,
-                        website => shift,
-                        annualRevenue => shift,
-                        industry => shift,
-                        numberOfEmployees => shift,
                         source => shift,
                         returnUrl => shift,
                         sourceUrl => shift,
@@ -991,7 +970,7 @@ package Api::Contact;
         return $Api::mainApi->Request('contact/add', "GET", @params);
     }
 
-        # Manually add or update a contacts status to Abuse, Bounced or Unsubscribed status (blocked).
+        # Manually add or update a contacts status to Abuse or Unsubscribed status (blocked).
             # string apikey - ApiKey that gives you access to our SMTP and HTTP API's.
             # string email - Proper email address.
             # ApiTypes::ContactStatus status - Name of status: Active, Engaged, Inactive, Abuse, Bounced, Unsubscribed.
@@ -1024,15 +1003,13 @@ package Api::Contact;
             # ApiTypes::ContactStatus status - Name of status: Active, Engaged, Inactive, Abuse, Bounced, Unsubscribed.
             # string rule - Query used for filtering. (default None)
             # IEnumerable<string> emails - Comma delimited list of contact emails (default None)
-            # bool allContacts - True: Include every Contact in your Account. Otherwise, false (default False)
     sub ChangeStatus
     {
         shift;
         my @params = [apikey => $Api::mainApi->{apikey}, 
                         status => shift,
                         rule => shift,
-                        emails => shift,
-                        allContacts => shift];
+                        emails => shift];
         return $Api::mainApi->Request('contact/changestatus', "GET", @params);
     }
 
@@ -1050,18 +1027,26 @@ package Api::Contact;
         return $Api::mainApi->Request('contact/countbystatus', "GET", @params);
     }
 
+        # Returns count of unsubscribe reasons for unsubscribed and complaint contacts.
+            # string apikey - ApiKey that gives you access to our SMTP and HTTP API's.
+        # Returns ApiTypes::ContactUnsubscribeReasonCounts
+    sub CountByUnsubscribeReason
+    {
+        shift;
+        my @params = [apikey => $Api::mainApi->{apikey}];
+        return $Api::mainApi->Request('contact/countbyunsubscribereason', "GET", @params);
+    }
+
         # Permanantly deletes the contacts provided.  You can provide either a qualified rule or a list of emails (comma separated string).
             # string apikey - ApiKey that gives you access to our SMTP and HTTP API's.
             # string rule - Query used for filtering. (default None)
             # IEnumerable<string> emails - Comma delimited list of contact emails (default None)
-            # bool allContacts - True: Include every Contact in your Account. Otherwise, false (default False)
     sub Delete
     {
         shift;
         my @params = [apikey => $Api::mainApi->{apikey}, 
                         rule => shift,
-                        emails => shift,
-                        allContacts => shift];
+                        emails => shift];
         return $Api::mainApi->Request('contact/delete', "GET", @params);
     }
 
@@ -1070,7 +1055,6 @@ package Api::Contact;
             # ApiTypes::ExportFileFormats fileFormat - Format of the exported file (default ApiTypes.ExportFileFormats.Csv)
             # string rule - Query used for filtering. (default None)
             # IEnumerable<string> emails - Comma delimited list of contact emails (default None)
-            # bool allContacts - True: Include every Contact in your Account. Otherwise, false (default False)
             # ApiTypes::CompressionFormat compressionFormat - FileResponse compression format. None or Zip. (default ApiTypes.CompressionFormat.EENone)
             # string fileName - Name of your file. (default None)
         # Returns ApiTypes::ExportLink
@@ -1081,7 +1065,6 @@ package Api::Contact;
                         fileFormat => shift,
                         rule => shift,
                         emails => shift,
-                        allContacts => shift,
                         compressionFormat => shift,
                         fileName => shift];
         return $Api::mainApi->Request('contact/export', "GET", @params);
@@ -1134,7 +1117,6 @@ package Api::Contact;
         # List of all contacts. If you have not specified RULE, all Contacts will be listed.
             # string apikey - ApiKey that gives you access to our SMTP and HTTP API's.
             # string rule - Query used for filtering. (default None)
-            # bool allContacts - True: Include every Contact in your Account. Otherwise, false (default False)
             # int limit - Maximum of loaded items. (default 20)
             # int offset - How many items should be loaded ahead. (default 0)
         # Returns List<ApiTypes::Contact>
@@ -1143,7 +1125,6 @@ package Api::Contact;
         shift;
         my @params = [apikey => $Api::mainApi->{apikey}, 
                         rule => shift,
-                        allContacts => shift,
                         limit => shift,
                         offset => shift];
         return $Api::mainApi->Request('contact/list', "GET", @params);
@@ -1200,19 +1181,13 @@ package Api::Contact;
             # IEnumerable<string> emails - Comma delimited list of contact emails
             # string firstName - First name. (default None)
             # string lastName - Last name. (default None)
-            # string title - Title (default None)
-            # string organization - Name of organization (default None)
-            # string industry - Industry contact works in (default None)
-            # string city - City. (default None)
-            # string country - Name of country. (default None)
-            # string state - State or province. (default None)
-            # string zip - Zip/postal code. (default None)
             # string publicListID - ID code of list (default None)
             # string listName - Name of your list. (default None)
             # ApiTypes::ContactStatus status - Name of status: Active, Engaged, Inactive, Abuse, Bounced, Unsubscribed. (default ApiTypes.ContactStatus.Active)
             # string notes - Free form field of notes (default None)
             # DateTime? consentDate - Date of consent to send this contact(s) your email. If not provided current date is used for consent. (default None)
             # string consentIP - IP address of consent to send this contact(s) your email. If not provided your current public IP address is used for consent. (default None)
+            # Dictionary<string, string> field - Custom contact field like firstname, lastname, city etc. Request parameters prefixed by field_ like field_firstname, field_lastname  (default None)
             # string notifyEmail - Emails, separated by semicolon, to which the notification about contact subscribing should be sent to (default None)
     sub QuickAdd
     {
@@ -1221,19 +1196,13 @@ package Api::Contact;
                         emails => shift,
                         firstName => shift,
                         lastName => shift,
-                        title => shift,
-                        organization => shift,
-                        industry => shift,
-                        city => shift,
-                        country => shift,
-                        state => shift,
-                        zip => shift,
                         publicListID => shift,
                         listName => shift,
                         status => shift,
                         notes => shift,
                         consentDate => shift,
                         consentIP => shift,
+                        field => shift,
                         notifyEmail => shift];
         return $Api::mainApi->Request('contact/quickadd', "GET", @params);
     }
@@ -1253,36 +1222,9 @@ package Api::Contact;
             # string email - Proper email address.
             # string firstName - First name. (default None)
             # string lastName - Last name. (default None)
-            # string organizationName - Name of organization (default None)
-            # string title - Title (default None)
-            # string city - City. (default None)
-            # string state - State or province. (default None)
-            # string country - Name of country. (default None)
-            # string zip - Zip/postal code. (default None)
-            # string birthDate - Date of birth in YYYY-MM-DD format (default None)
-            # string gender - Your gender (default None)
-            # string phone - Phone number (default None)
-            # bool? activate - True, if Contact should be activated. Otherwise, false (default None)
-            # string industry - Industry contact works in (default None)
-            # int numberOfEmployees - Number of employees (default 0)
-            # string annualRevenue - Annual revenue of contact (default None)
-            # int purchaseCount - Number of purchases contact has made (default 0)
-            # string firstPurchase - Date of first purchase in YYYY-MM-DD format (default None)
-            # string lastPurchase - Date of last purchase in YYYY-MM-DD format (default None)
-            # string notes - Free form field of notes (default None)
-            # string websiteUrl - Website of contact (default None)
-            # string mobileNumber - Mobile phone number (default None)
-            # string faxNumber - Fax number (default None)
-            # string linkedInBio - Biography for Linked-In (default None)
-            # int linkedInConnections - Number of Linked-In connections (default 0)
-            # string twitterBio - Biography for Twitter (default None)
-            # string twitterUsername - User name for Twitter (default None)
-            # string twitterProfilePhoto - URL for Twitter photo (default None)
-            # int twitterFollowerCount - Number of Twitter followers (default 0)
-            # int pageViews - Number of page views (default 0)
-            # int visits - Number of website visits (default 0)
             # bool clearRestOfFields - States if the fields that were omitted in this request are to be reset or should they be left with their current value (default True)
             # Dictionary<string, string> field - Custom contact field like firstname, lastname, city etc. Request parameters prefixed by field_ like field_firstname, field_lastname  (default None)
+            # string customFields - Custom contact field like firstname, lastname, city etc. JSON serialized text like { "city":"london" }  (default None)
         # Returns ApiTypes::Contact
     sub Update
     {
@@ -1291,36 +1233,9 @@ package Api::Contact;
                         email => shift,
                         firstName => shift,
                         lastName => shift,
-                        organizationName => shift,
-                        title => shift,
-                        city => shift,
-                        state => shift,
-                        country => shift,
-                        zip => shift,
-                        birthDate => shift,
-                        gender => shift,
-                        phone => shift,
-                        activate => shift,
-                        industry => shift,
-                        numberOfEmployees => shift,
-                        annualRevenue => shift,
-                        purchaseCount => shift,
-                        firstPurchase => shift,
-                        lastPurchase => shift,
-                        notes => shift,
-                        websiteUrl => shift,
-                        mobileNumber => shift,
-                        faxNumber => shift,
-                        linkedInBio => shift,
-                        linkedInConnections => shift,
-                        twitterBio => shift,
-                        twitterUsername => shift,
-                        twitterProfilePhoto => shift,
-                        twitterFollowerCount => shift,
-                        pageViews => shift,
-                        visits => shift,
                         clearRestOfFields => shift,
-                        field => shift];
+                        field => shift,
+                        customFields => shift];
         return $Api::mainApi->Request('contact/update', "GET", @params);
     }
 
@@ -1494,9 +1409,9 @@ package Api::Email;
             # string replyTo - Email address to reply to (default None)
             # string replyToName - Display name of the reply to address (default None)
             # IEnumerable<string> to - List of email recipients (each email is treated separately, like a BCC). Separated by comma or semicolon. We suggest using the "msgTo" parameter if backward compatibility with API version 1 is not a must. (default None)
-            # string[] msgTo - Optional parameter. Will be ignored if the 'to' parameter is also provided. List of email recipients (visible to all other recipients of the message as TO MIME header). Separated by comma or semicolon. (default None)
-            # string[] msgCC - Optional parameter. Will be ignored if the 'to' parameter is also provided. List of email recipients (visible to all other recipients of the message as CC MIME header). Separated by comma or semicolon. (default None)
-            # string[] msgBcc - Optional parameter. Will be ignored if the 'to' parameter is also provided. List of email recipients (each email is treated seperately). Separated by comma or semicolon. (default None)
+            # IEnumerable<string> msgTo - Optional parameter. Will be ignored if the 'to' parameter is also provided. List of email recipients (visible to all other recipients of the message as TO MIME header). Separated by comma or semicolon. (default None)
+            # IEnumerable<string> msgCC - Optional parameter. Will be ignored if the 'to' parameter is also provided. List of email recipients (visible to all other recipients of the message as CC MIME header). Separated by comma or semicolon. (default None)
+            # IEnumerable<string> msgBcc - Optional parameter. Will be ignored if the 'to' parameter is also provided. List of email recipients (each email is treated seperately). Separated by comma or semicolon. (default None)
             # IEnumerable<string> lists - The name of a contact list you would like to send to. Separate multiple contact lists by commas or semicolons. (default None)
             # IEnumerable<string> segments - The name of a segment you would like to send to. Separate multiple segments by comma or semicolon. Insert "0" for all Active contacts. (default None)
             # string mergeSourceFilename - File name one of attachments which is a CSV list of Recipients. (default None)
@@ -1512,7 +1427,7 @@ package Api::Email;
             # Dictionary<string, string> headers - Optional Custom Headers. Request parameters prefixed by headers_ like headers_customheader1, headers_customheader2. Note: a space is required after the colon before the custom header value. headers_xmailer=xmailer: header-value1 (default None)
             # string postBack - Optional header returned in notifications. (default None)
             # Dictionary<string, string> merge - Request parameters prefixed by merge_ like merge_firstname, merge_lastname. If sending to a template you can send merge_ fields to merge data with the template. Template fields are entered with {firstname}, {lastname} etc. (default None)
-            # string timeOffSetMinutes - Number of minutes in the future this email should be sent (default None)
+            # string timeOffSetMinutes - Number of minutes in the future this email should be sent up to a maximum of 1 year (524160 minutes) (default None)
             # string poolName - Name of your custom IP Pool to be used in the sending process (default None)
             # bool isTransactional - True, if email is transactional (non-bulk, non-marketing, non-commercial). Otherwise, false (default False)
         # Returns ApiTypes::EmailSend
@@ -1814,6 +1729,7 @@ package Api::List;
             # IEnumerable<string> emails - Comma delimited list of contact emails (default None)
             # bool? moveAll - TRUE - moves all contacts; FALSE - moves contacts provided in the 'emails' parameter. This is ignored if the 'statuses' parameter has been provided (default None)
             # IEnumerable<ApiTypes::ContactStatus> statuses - List of contact statuses which are eligible to move. This ignores the 'moveAll' parameter (default None)
+            # string rule - Query used for filtering. (default None)
     sub MoveContacts
     {
         shift;
@@ -1822,7 +1738,8 @@ package Api::List;
                         newListName => shift,
                         emails => shift,
                         moveAll => shift,
-                        statuses => shift];
+                        statuses => shift,
+                        rule => shift];
         return $Api::mainApi->Request('list/movecontacts', "GET", @params);
     }
 
@@ -2678,7 +2595,7 @@ package ApiTypes;
         LitmusCredits => shift,
 
         #
-        # Enable advanced tools on your Account.
+        # Enable contact delivery and optimization tools on your Account.
         #
         EnableContactFeatures => shift,
 
@@ -2924,7 +2841,7 @@ package ApiTypes;
         EnableUITooltips => shift,
 
         #
-        # True, if you want to use Advanced Tools.  Otherwise, false
+        # True, if you want to use Contact Delivery Tools.  Otherwise, false
         #
         EnableContactFeatures => shift,
 
@@ -3533,6 +3450,33 @@ package ApiTypes;
     };
 
     # 
+    # 
+    # 
+    package ApiTypes::CertificateValidationStatus;
+    use constant {
+        #
+        # 
+        #
+        ERROROCCURED => '-2',
+
+        #
+        # 
+        #
+        CERTNOTSET => '0',
+
+        #
+        # 
+        #
+        VALID => '1',
+
+        #
+        # 
+        #
+        NOTVALID => '2',
+
+    };
+
+    # 
     # SMTP and HTTP API channel for grouping email delivery
     # 
     package ApiTypes::Channel;
@@ -3656,51 +3600,6 @@ package ApiTypes;
         LastName => shift,
 
         #
-        # Title
-        #
-        Title => shift,
-
-        #
-        # Name of organization
-        #
-        OrganizationName => shift,
-
-        #
-        # City.
-        #
-        City => shift,
-
-        #
-        # Name of country.
-        #
-        Country => shift,
-
-        #
-        # State or province.
-        #
-        State => shift,
-
-        #
-        # Zip/postal code.
-        #
-        Zip => shift,
-
-        #
-        # Phone number
-        #
-        Phone => shift,
-
-        #
-        # Date of birth in YYYY-MM-DD format
-        #
-        BirthDate => shift,
-
-        #
-        # Your gender
-        #
-        Gender => shift,
-
-        #
         # Name of status: Active, Engaged, Inactive, Abuse, Bounced, Unsubscribed.
         #
         Status => shift,
@@ -3771,84 +3670,9 @@ package ApiTypes;
         CreatedFromIP => shift,
 
         #
-        # Yearly revenue for the contact
-        #
-        Revenue => shift,
-
-        #
-        # Number of purchases contact has made
-        #
-        PurchaseCount => shift,
-
-        #
-        # Mobile phone number
-        #
-        MobileNumber => shift,
-
-        #
-        # Fax number
-        #
-        FaxNumber => shift,
-
-        #
-        # Biography for Linked-In
-        #
-        LinkedInBio => shift,
-
-        #
-        # Number of Linked-In connections
-        #
-        LinkedInConnections => shift,
-
-        #
-        # Biography for Twitter
-        #
-        TwitterBio => shift,
-
-        #
-        # User name for Twitter
-        #
-        TwitterUsername => shift,
-
-        #
-        # URL for Twitter photo
-        #
-        TwitterProfilePhoto => shift,
-
-        #
-        # Number of Twitter followers
-        #
-        TwitterFollowerCount => shift,
-
-        #
         # Unsubscribed date in YYYY-MM-DD format
         #
         UnsubscribedDate => shift,
-
-        #
-        # Industry contact works in
-        #
-        Industry => shift,
-
-        #
-        # Number of employees
-        #
-        NumberOfEmployees => shift,
-
-        #
-        # Annual revenue of contact
-        #
-        AnnualRevenue => shift,
-
-        #
-        # Date of first purchase in YYYY-MM-DD format
-        #
-        FirstPurchase => shift,
-
-        #
-        # Date of last purchase in YYYY-MM-DD format
-        #
-        LastPurchase => shift,
 
         #
         # Free form field of notes
@@ -3861,21 +3685,6 @@ package ApiTypes;
         WebsiteUrl => shift,
 
         #
-        # Number of page views
-        #
-        PageViews => shift,
-
-        #
-        # Number of website visits
-        #
-        Visits => shift,
-
-        #
-        # Number of messages sent last month
-        #
-        LastMonthSent => shift,
-
-        #
         # Date this contact last opened an email
         #
         LastOpened => shift,
@@ -3886,9 +3695,9 @@ package ApiTypes;
         LastClicked => shift,
 
         #
-        # Your gravatar hash for image
+        # Custom contact field like firstname, lastname, city etc. JSON serialized text like { "city":"london" } 
         #
-        GravatarHash => shift,
+        CustomFields => shift,
 
         };
         bless $self, $class;
@@ -3988,6 +3797,11 @@ package ApiTypes;
         # Country of the event.
         #
         Country => shift,
+
+        #
+        # Information about the event
+        #
+        Data => shift,
 
         };
         bless $self, $class;
@@ -4137,6 +3951,69 @@ package ApiTypes;
     }
 
     # 
+    # Number of Unsubscribed or Complaint Contacts, grouped by Unsubscribe Reason;
+    # 
+    package ApiTypes::ContactUnsubscribeReasonCounts;
+    sub new
+    {
+        my $class = shift;
+        my $self = {
+        #
+        # 
+        #
+        Unknown => shift,
+
+        #
+        # 
+        #
+        NoLongerWant => shift,
+
+        #
+        # 
+        #
+        IrrelevantContent => shift,
+
+        #
+        # 
+        #
+        TooFrequent => shift,
+
+        #
+        # 
+        #
+        NeverConsented => shift,
+
+        #
+        # 
+        #
+        DeceptiveContent => shift,
+
+        #
+        # 
+        #
+        AbuseReported => shift,
+
+        #
+        # 
+        #
+        ThirdParty => shift,
+
+        #
+        # 
+        #
+        ListUnsubscribe => shift,
+
+        #
+        # 
+        #
+        FromJourney => shift,
+
+        };
+        bless $self, $class;
+        return $self;
+    }
+
+    # 
     # Type of credits
     # 
     package ApiTypes::CreditType;
@@ -4278,6 +4155,28 @@ package ApiTypes;
         # 
         #
         Type => shift,
+
+        #
+        # 0 - NotValidated, 1 - Validated successfully, 2 - Invalid, 3 - Broken (tracking was frequnetly verfied in given period and still is invalid)
+            For statuses: 0, 1, 3 tracking will be verified in normal periods
+            For status 2 tracking will be verified in high frequent periods
+        #
+        TrackingStatus => shift,
+
+        #
+        # 
+        #
+        CertificateStatus => shift,
+
+        #
+        # 
+        #
+        CertificateValidationError => shift,
+
+        #
+        # 
+        #
+        TrackingTypeUserRequest => shift,
 
         };
         bless $self, $class;
@@ -5418,9 +5317,24 @@ package ApiTypes;
         Channel => shift,
 
         #
-        # Date in YYYY-MM-DDThh:ii:ss format
+        # Creation date
         #
         Date => shift,
+
+        #
+        # 
+        #
+        DateSent => shift,
+
+        #
+        # 
+        #
+        DateOpened => shift,
+
+        #
+        # 
+        #
+        DateClicked => shift,
 
         #
         # Content of message, HTML encoded
@@ -6079,7 +5993,7 @@ package ApiTypes;
         MaxContacts => shift,
 
         #
-        # True, if you want to use Advanced Tools.  Otherwise, false
+        # True, if you want to use Contact Delivery Tools.  Otherwise, false
         #
         EnableContactFeatures => shift,
 
@@ -6157,7 +6071,7 @@ package ApiTypes;
         EnablePrivateIPRequest => shift,
 
         #
-        # True, if you want to use Advanced Tools.  Otherwise, false
+        # True, if you want to use Contact Delivery Tools.  Otherwise, false
         #
         EnableContactFeatures => shift,
 
@@ -6652,12 +6566,59 @@ package ApiTypes;
         #
         # 
         #
+        EENONE => '-2',
+
+        #
+        # 
+        #
+        DELETE => '-1',
+
+        #
+        # 
+        #
         HTTP => '0',
 
         #
         # 
         #
         EXTERNALHTTPS => '1',
+
+        #
+        # 
+        #
+        INTERNALCERTHTTPS => '2',
+
+        #
+        # 
+        #
+        LETSENCRYPTCERT => '3',
+
+    };
+
+    # 
+    # Status of ValidDomain used by DomainValidationService to determine how often tracking validation should be performed.
+    # 
+    package ApiTypes::TrackingValidationStatus;
+    use constant {
+        #
+        # 
+        #
+        VALIDATED => '0',
+
+        #
+        # 
+        #
+        NOTVALIDATED => '1',
+
+        #
+        # 
+        #
+        INVALID => '2',
+
+        #
+        # 
+        #
+        BROKEN => '3',
 
     };
 
@@ -6778,7 +6739,7 @@ package ApiTypes;
         LitmusCreditsCost => shift,
 
         #
-        # Daily cost of Advanced Tools
+        # Daily cost of Contact Delivery Tools
         #
         ContactCost => shift,
 
@@ -6791,6 +6752,11 @@ package ApiTypes;
         # 
         #
         SupportCost => shift,
+
+        #
+        # 
+        #
+        EmailCost => shift,
 
         };
         bless $self, $class;

@@ -66,11 +66,11 @@ DIRFILESEP = \\
 DFSEP = $(DIRFILESEP)
 NAME = ElasticEmail
 NAME_SYM = ElasticEmail
-VERSION = 0.02
+VERSION = 0.03
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_02
+VERSION_SYM = 0_03
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.02
+XS_VERSION = 0.03
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib\arch
@@ -263,7 +263,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = ElasticEmail
-DISTVNAME = ElasticEmail-0.02
+DISTVNAME = ElasticEmail-0.03
 
 
 # --- MakeMaker macro section:
@@ -520,7 +520,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) "    - inc" >> META_new.yml
 	$(NOECHO) $(ECHO) requires: >> META_new.yml
 	$(NOECHO) $(ECHO) "  perl: '5.006'" >> META_new.yml
-	$(NOECHO) $(ECHO) "version: '0.02'" >> META_new.yml
+	$(NOECHO) $(ECHO) "version: '0.03'" >> META_new.yml
 	$(NOECHO) $(ECHO) "x_serialization_backend: 'CPAN::Meta::YAML version 0.018'" >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -563,7 +563,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) "      }}" >> META_new.json
 	$(NOECHO) $(ECHO) "   }}," >> META_new.json
 	$(NOECHO) $(ECHO) "   \"release_status\" : \"stable\"," >> META_new.json
-	$(NOECHO) $(ECHO) "   \"version\" : \"0.02\"," >> META_new.json
+	$(NOECHO) $(ECHO) "   \"version\" : \"0.03\"," >> META_new.json
 	$(NOECHO) $(ECHO) "   \"x_serialization_backend\" : \"JSON::PP version 2.27400\"" >> META_new.json
 	$(NOECHO) $(ECHO) }} >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -875,7 +875,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) "<SOFTPKG NAME=\"ElasticEmail\" VERSION=\"0.02\">" > ElasticEmail.ppd
+	$(NOECHO) $(ECHO) "<SOFTPKG NAME=\"ElasticEmail\" VERSION=\"0.03\">" > ElasticEmail.ppd
 	$(NOECHO) $(ECHO) "    <ABSTRACT>The great new ElasticEmail!</ABSTRACT>" >> ElasticEmail.ppd
 	$(NOECHO) $(ECHO) "    <AUTHOR>Elastic Email &lt;support@elasticemail.com&gt;</AUTHOR>" >> ElasticEmail.ppd
 	$(NOECHO) $(ECHO) "    <IMPLEMENTATION>" >> ElasticEmail.ppd
