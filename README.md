@@ -1,8 +1,8 @@
-**LEGACY**
+> [!WARNING]
+> **Deprecated.** This is the legacy Perl client for the Elastic Email **Web API v2**. It is archived and no longer maintained.
+> Use the official [elasticemail-perl](https://github.com/ElasticEmail/elasticemail-perl) SDK for the [REST API v4](https://elasticemail.com/developers/api-documentation/rest-api) instead.
 
-New version of API - https://github.com/ElasticEmail/elasticemail-perl
-
-**This library allows you to quickly and easily use the Elastic Email Web API v2 via PHP.**
+**This library allows you to quickly and easily use the Elastic Email Web API v2 via Perl.**
 
 # Prerequisites #
 * [An Elastic Email account](https://elasticemail.com/account/)
